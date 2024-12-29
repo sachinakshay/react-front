@@ -1,0 +1,33 @@
+name: Upload Files to S3
+
+on:
+  push:
+    branches:
+      - master  # Trigger the workflow on push to the main branch
+
+jobs:
+  upload_to_s3:
+    runs-on: ubuntu-latest  # Run the job on the latest Ubuntu environment
+
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Step 2: Set up AWS credentials using Access Key and Secret Key
+    - name: Set up AWS credentials
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # GitHub Secrets for AWS Access Key
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # GitHub Secrets for AWS Secret Key
+        AWS_REGION: us-west-2  # Specify the region of your S3 bucket
+      run: |
+        echo "AWS credentials configured successfully"
+        
+    # Step 3: Upload all files to the specified S3 bucket using AWS CLI
+    - name: Upload files to S3
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: us-west-2
+      run: |
+        aws s3 sync . s3://sachinakshay-new2002/ --exclude '.git/' --exclude 'node_modules/' --exclude '.github/*'
